@@ -1,0 +1,25 @@
+body {
+	background-color: white;
+}
+.image-lazy-load img {
+	opacity: 0;
+	display: block;
+}
+
+/* img { */
+/* width: 100px;
+	height: auto; */
+/* } */
+
+.image-lazy-loading {
+	background-color: gray;
+	display: inline-block;
+}
+
+/* .image-lazy-loading::after {
+	content: '';
+	display: block;
+	height: 100px;
+	width: 100px;
+	background-color: gray;
+} */
