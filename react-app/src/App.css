@@ -11,6 +11,10 @@ body {
 	height: auto; */
 /* } */
 
+.image-wrap {
+	background-color: gray;
+}
+
 .image-lazy-loading {
 	background-color: gray;
 	display: inline-block;

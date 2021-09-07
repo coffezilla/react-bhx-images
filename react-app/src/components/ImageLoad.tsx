@@ -1,25 +1,30 @@
-/* eslint-disable operator-linebreak */
-import React, { useEffect, useRef } from 'react';
+/* eslint-disable */
+import React, { useEffect, useRef, useState } from 'react';
 
 interface IProps {
 	src: string;
 	height: number;
 	width: number;
 	preload?: boolean;
+	scrollChecker?: any;
 }
 
 const allImages: any[] = [];
 
-const imageLoad = ({ src, height, width, preload }: IProps) => {
+const imageLoad = ({ src, height, width, preload, scrollChecker }: IProps) => {
+	const [LOAD_NOW, setLOAD_NOW] = useState(false);
 	const imageContent = useRef<HTMLDivElement>(null);
-	const LOAD_NOW = true;
 
 	useEffect(() => {
-		console.log('romero', preload, allImages);
-		if (LOAD_NOW) {
+		allImages.push(imageContent);
+	}, []);
+
+	useEffect(() => {
+		if (scrollChecker === src) {
+			setLOAD_NOW(true);
 			const newImage = new Image();
 			newImage.src = src;
-			allImages.push(imageContent);
+
 			if (imageContent.current !== null) {
 				imageContent.current.classList.add('image-lazy-loading');
 			}
@@ -30,12 +35,16 @@ const imageLoad = ({ src, height, width, preload }: IProps) => {
 				}
 			};
 		}
-	}, []);
+	}, [scrollChecker]);
 
 	return (
-		<div className="image-wrap image-lazy-load" ref={imageContent}>
-			<p>{allImages.length}</p>
-			{preload && <img src={src} alt="sponsor1" height={`${height}px`} width={`${width}px`} />}
+		<div
+			className="image-wrap image-lazy-load"
+			data-source={src}
+			ref={imageContent}
+			style={{ height: `${height}px`, width: `${width}px` }}
+		>
+			{LOAD_NOW && <img src={src} alt="sponsor1" height={`${height}px`} width={`${width}px`} />}
 		</div>
 	);
 };
@@ -43,7 +52,9 @@ const imageLoad = ({ src, height, width, preload }: IProps) => {
 export default imageLoad;
 
 export const useImageScrolling = () => {
+	const [scrollCheckState, setScrollCheckState] = React.useState<any>('');
 	const autoLoad = true;
+	let lastIndexImageLoaded = 0;
 	const refContentScroll: React.MutableRefObject<{
 		contentHeight: number;
 		windowInnerHeight: number;
@@ -51,11 +62,14 @@ export const useImageScrolling = () => {
 		contentHeight: 0,
 		windowInnerHeight: 0,
 	});
+	const updateCheck = (imagsrc: any) => {
+		setScrollCheckState(imagsrc);
+	};
 
 	useEffect(() => {
 		const handleBind = () => {
 			if (allImages.length > 0) {
-				const contentScrollBox: Element | null = allImages[0].current;
+				const contentScrollBox: Element | null = allImages[lastIndexImageLoaded].current;
 
 				if (autoLoad && contentScrollBox !== null) {
 					if (contentScrollBox instanceof HTMLElement) {
@@ -85,14 +99,15 @@ export const useImageScrolling = () => {
 				refContentScroll.current.windowInnerHeight + windowTopScroll >
 				refContentScroll.current.contentHeight
 			) {
-				console.log('chegou', allImages[0].current);
-				allImages.shift();
+				const imgLoadedSrc = allImages[lastIndexImageLoaded].current.dataset.source;
+				updateCheck(imgLoadedSrc);
 
-				if (allImages.length === 0) {
-					window.removeEventListener('scroll', scrolling, false);
-					console.log('acabou');
-				} else {
+				if (lastIndexImageLoaded < allImages.length - 1) {
+					lastIndexImageLoaded += 1;
 					handleBind();
+				} else {
+					console.log('acabou');
+					window.removeEventListener('scroll', scrolling, false);
 				}
 			}
 		};
@@ -101,11 +116,12 @@ export const useImageScrolling = () => {
 
 		if (allImages.length > 0) {
 			window.addEventListener('scroll', scrolling, false);
-			console.log('add ');
 		}
 
 		return () => {
 			window.removeEventListener('scroll', scrolling);
 		};
 	}, [allImages]);
+
+	return scrollCheckState;
 };
