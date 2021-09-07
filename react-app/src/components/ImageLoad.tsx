@@ -1,27 +1,42 @@
-/* eslint-disable */
+/* eslint-disable operator-linebreak */
 import React, { useEffect, useRef, useState } from 'react';
+import './ImageLoad.css';
 
 interface IProps {
 	src: string;
-	height: number;
-	width: number;
+	height?: number;
+	width?: number;
 	preload?: boolean;
-	scrollChecker?: any;
+	customClass?: string;
+	scrollChecker?: string;
+	background?: boolean;
+	children?: React.ReactNode;
 }
 
 const allImages: any[] = [];
 
-const imageLoad = ({ src, height, width, preload, scrollChecker }: IProps) => {
-	const [LOAD_NOW, setLOAD_NOW] = useState(false);
+const imageLoad = ({
+	src,
+	height,
+	width,
+	preload,
+	scrollChecker,
+	background,
+	children,
+	customClass,
+}: IProps) => {
+	const [currentLoad, setCurrentLoad] = useState(preload);
 	const imageContent = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		allImages.push(imageContent);
+		if (scrollChecker !== undefined) {
+			allImages.push(imageContent);
+		}
 	}, []);
 
 	useEffect(() => {
-		if (scrollChecker === src) {
-			setLOAD_NOW(true);
+		if (scrollChecker === src || scrollChecker === undefined) {
+			setCurrentLoad(true);
 			const newImage = new Image();
 			newImage.src = src;
 
@@ -39,20 +54,32 @@ const imageLoad = ({ src, height, width, preload, scrollChecker }: IProps) => {
 
 	return (
 		<div
-			className="image-wrap image-lazy-load"
+			className={`image-wrap image-lazy-load ${customClass && customClass}`}
 			data-source={src}
 			ref={imageContent}
 			style={{ height: `${height}px`, width: `${width}px` }}
 		>
-			{LOAD_NOW && <img src={src} alt="sponsor1" height={`${height}px`} width={`${width}px`} />}
+			<div className="image-wrap-load">
+				{currentLoad &&
+					(background ? (
+						<>{background && children}</>
+					) : (
+						<img
+							src={src}
+							alt="imagem loaded"
+							height={`${height}px`}
+							width={`${width}px`}
+							className={customClass && customClass}
+						/>
+					))}
+			</div>
 		</div>
 	);
 };
-
 export default imageLoad;
 
 export const useImageScrolling = () => {
-	const [scrollCheckState, setScrollCheckState] = React.useState<any>('');
+	const [scrollCheckState, setScrollCheckState] = React.useState<string>('');
 	const autoLoad = true;
 	let lastIndexImageLoaded = 0;
 	const refContentScroll: React.MutableRefObject<{
@@ -62,7 +89,7 @@ export const useImageScrolling = () => {
 		contentHeight: 0,
 		windowInnerHeight: 0,
 	});
-	const updateCheck = (imagsrc: any) => {
+	const updateCheck = (imagsrc: string) => {
 		setScrollCheckState(imagsrc);
 	};
 
@@ -106,7 +133,6 @@ export const useImageScrolling = () => {
 					lastIndexImageLoaded += 1;
 					handleBind();
 				} else {
-					console.log('acabou');
 					window.removeEventListener('scroll', scrolling, false);
 				}
 			}

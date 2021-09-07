@@ -1,29 +1,6 @@
-body {
-	background-color: white;
-}
-.image-lazy-load img {
-	opacity: 0;
+.background-sample {
+	height: 200px;
+	width: 100%;
 	display: block;
+	background-size: cover;
 }
-
-/* img { */
-/* width: 100px;
-	height: auto; */
-/* } */
-
-.image-wrap {
-	background-color: gray;
-}
-
-.image-lazy-loading {
-	background-color: gray;
-	display: inline-block;
-}
-
-/* .image-lazy-loading::after {
-	content: '';
-	display: block;
-	height: 100px;
-	width: 100px;
-	background-color: gray;
-} */

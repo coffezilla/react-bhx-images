@@ -1,0 +1,27 @@
+body {
+	background-color: white;
+}
+.image-lazy-load img {
+	display: block;
+}
+
+.image-wrap {
+	background-color: gray;
+	background-size: cover;
+	height: 100%;
+	width: 100%;
+}
+
+.image-wrap-load {
+	transition: opacity 0.5s;
+}
+
+.image-lazy-load .image-wrap-load {
+	transition: opacity 0.5s;
+	opacity: 0;
+}
+
+.image-lazy-loading {
+	background-color: gray;
+	display: inline-block;
+}
