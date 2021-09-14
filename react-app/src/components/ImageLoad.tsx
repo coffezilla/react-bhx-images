@@ -1,6 +1,10 @@
 /* eslint-disable operator-linebreak */
 import React, { useEffect, useRef, useState } from 'react';
+import { install } from 'resize-observer';
+
 import './ImageLoad.css';
+
+if (!window.ResizeObserver) install();
 
 interface IProps {
 	src: string;
